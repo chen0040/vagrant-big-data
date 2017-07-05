@@ -6,6 +6,16 @@ Vagrantfiles for development in big data
 
 git clone this project to your local computer and cd to one of the directory, then run "vagrant up".
 
+# Features
+
+Allow user to create different devops environment locally using Vagrantfiles
+
+* Zookeeper cluster
+* Zookeeper + Kafka
+* Storm with Zookeeper + Kafka
+* Spark with Zookeeper + Kafka
+* Spark with Mesos + Zookeeper + Kafka 
+
 # Usage
 
 ### Zookeeper Cluster
@@ -74,7 +84,7 @@ To test the kafka consumer, run the following command:
 /opt/kafka/bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic TutorialTopic --from-beginning
 ```
 
-### Storm Cluster
+### Storm Cluster (with Zookeeper + Kafka)
 
 cd to the directory "storm" under the root directory and run "vagrant up". This will start a multi-machine vagrant setup in which a 
 storm cluster will be auto-started. The following VMs will be setup to run:
@@ -97,6 +107,42 @@ storm cluster will be auto-started. The following VMs will be setup to run:
     * stormslave3:192.168.10.20
     
 For each of the storm VMs, the storm is installed at /opt/storm, and the configuration is at /opt/storm/conf/storm.yaml. 
+
+Within stormnimbus1 VM, the storm nimbus and storm ui is auto started when the VM is up or resumed
+
+Within the stormnimbus1 VM, you can issue command such as as "service storm-nimbus start/stop/restart/status" 
+and "service storm-ui start/stop/restart/status"
+
+Within stormslave[x] VM, the storm supervisor is auto started when the VM is up.
+
+Within the stormslave[x] VMs, you can issue command such as "service storm-supervisor start/stop/restart/status"
+
+Once the vagrant VMs are up and running, you can go to your host computer and enter 
+the url http://192.168.10.17:8080 to your browser on the host computer. This will show the storm UI.
+
+### Spark Cluster (with Zookeeper + Kafka)
+
+cd to the directory "spark" under the root directory and run "vagrant up". This will start a multi-machine vagrant setup in which a 
+storm cluster will be auto-started. The following VMs will be setup to run:
+
+* a zookeeper cluster at the following hostname:ips:
+
+    * zoo1:192.168.10.12
+    * zoo2:192.168.10.13
+    * zoo3:192.168.10.14
+
+* a kafka server at the following hostname:ip (which use the zookeeper cluster above):
+
+    * kafka1:192.168.10.15
+    
+* a storm cluster at the following hostname:ips (which uses the zookeeper cluster above):
+
+    * sparkmaster:192.168.10.21
+    * sparkslave1:192.168.10.22
+    * sparkslave2:192.168.10.23
+    * sparkslave3:192.168.10.24
+    
+For each of the spark VMs, the spark is installed at /opt/spark, and the configuration is at /opt/storm/conf/storm.yaml. 
 
 Within stormnimbus1 VM, the storm nimbus and storm ui is auto started when the VM is up or resumed
 

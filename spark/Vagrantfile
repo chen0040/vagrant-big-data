@@ -1,0 +1,183 @@
+# -*- mode: ruby -*# vi: set ft=ruby :
+require 'yaml'
+vagrantConfig = YAML.load_file 'Vagrantfile.config.yml'
+Vagrant.configure("2") do |config|
+    config.vm.box = "bento/ubuntu-16.04"
+
+    config.vm.define "zoo1" do |zoo1|
+        zoo1.vm.network "private_network", ip: vagrantConfig['ip1']
+        zoo1.vm.hostname = "zoo1"
+    end
+
+    config.vm.define "zoo2" do |zoo2|
+        zoo2.vm.network "private_network", ip: vagrantConfig['ip2']
+        zoo2.vm.hostname = "zoo2"
+    end
+
+    config.vm.define "zoo3" do |zoo3|
+        zoo3.vm.network "private_network", ip: vagrantConfig['ip3']
+        zoo3.vm.hostname = "zoo3"
+    end
+
+    config.vm.define "kafka1" do |kafka1|
+        kafka1.vm.network "private_network", ip: vagrantConfig['ip4']
+        kafka1.vm.hostname = "kafka1"
+    end
+	
+    config.vm.define "sparkslave1" do |sparkslave1|
+        sparkslave1.vm.network "private_network", ip: vagrantConfig['ip6']
+        sparkslave1.vm.hostname = "sparkslave1"
+    end
+	
+    config.vm.define "sparkslave2" do |sparkslave2|
+        sparkslave2.vm.network "private_network", ip: vagrantConfig['ip7']
+        sparkslave2.vm.hostname = "sparkslave2"
+    end
+	
+    config.vm.define "sparkslave3" do |sparkslave3|
+        sparkslave3.vm.network "private_network", ip: vagrantConfig['ip8']
+        sparkslave3.vm.hostname = "sparkslave3"
+    end
+	
+    config.vm.define "sparkmaster1" do |sparkmaster1|
+        sparkmaster1.vm.network "private_network", ip: vagrantConfig['ip5']
+        sparkmaster1.vm.hostname = "sparkmaster1"
+    end
+    
+    # config.vm.synced_folder "src/", "/home/vagrant/src", owner:"vagrant", group: "vagrant"
+    config.vm.synced_folder "devops/", "/home/vagrant/devops", owner:"vagrant", group: "vagrant"
+
+    # VirtualBox specific settings
+    config.vm.provider "virtualbox" do |vb|
+        vb.gui = false
+        vb.memory = "1024"
+        vb.cpus = 1
+    end
+
+    config.vm.provision "shell", inline: "sudo apt-get update -y"
+    config.vm.provision "shell", inline: "sudo apt-get upgrade -y"
+    config.vm.provision "shell", inline: "sudo add-apt-repository -y ppa:webupd8team/java"
+    config.vm.provision "shell", inline: "sudo apt-get update -y"
+    config.vm.provision "shell", inline: "echo 'oracle-java8-installer shared/accepted-oracle-license-v1-1 select true' | sudo debconf-set-selections"
+    config.vm.provision "shell", inline: "sudo apt-get install oracle-java8-installer -y"
+
+
+    config.vm.define "zoo1" do |zoo1|
+        zoo1.vm.provision "shell", inline: "sudo apt-get install zookeeper -y"
+        zoo1.vm.provision "shell", inline: "sudo apt-get install zookeeperd -y"
+        zoo1.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/zookeeper/hosts.1 >> /etc/hosts"
+        zoo1.vm.provision "shell", inline: "echo 1 > /etc/zookeeper/conf/myid"
+        zoo1.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/zookeeper/zk1.cfg >> /etc/zookeeper/conf/zoo.cfg"
+        zoo1.vm.provision "shell", inline: "sudo service zookeeper restart"
+    end
+
+    config.vm.define "zoo2" do |zoo2|
+        zoo2.vm.provision "shell", inline: "sudo apt-get install zookeeper -y"
+        zoo2.vm.provision "shell", inline: "sudo apt-get install zookeeperd -y"
+        zoo2.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/zookeeper/hosts.2 >> /etc/hosts"
+        zoo2.vm.provision "shell", inline: "echo 2 > /etc/zookeeper/conf/myid"
+        zoo2.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/zookeeper/zk2.cfg >> /etc/zookeeper/conf/zoo.cfg"
+        zoo2.vm.provision "shell", inline: "sudo service zookeeper restart"
+    end
+
+    config.vm.define "zoo3" do |zoo3|
+        zoo3.vm.provision "shell", inline: "sudo apt-get install zookeeper -y"
+        zoo3.vm.provision "shell", inline: "sudo apt-get install zookeeperd -y"
+        zoo3.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/zookeeper/hosts.3 >> /etc/hosts"
+        zoo3.vm.provision "shell", inline: "echo 3 > /etc/zookeeper/conf/myid"
+        zoo3.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/zookeeper/zk3.cfg >> /etc/zookeeper/conf/zoo.cfg"
+        zoo3.vm.provision "shell", inline: "sudo service zookeeper restart"
+    end
+
+    config.vm.define "kafka1" do |kafka1|
+        kafka1.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/kafka/hosts.1 >> /etc/hosts"
+        kafka1.vm.provision "shell", inline: "wget http://www-eu.apache.org/dist/kafka/0.11.0.0/kafka_2.11-0.11.0.0.tgz"
+        kafka1.vm.provision "shell", inline: "tar -xvzf kafka_2.11-0.11.0.0.tgz"
+        kafka1.vm.provision "shell", inline: "cp -R /home/vagrant/kafka_2.11-0.11.0.0 /opt"
+		kafka1.vm.provision "shell", inline: "chmod -R 777 /opt/kafka_2.11-0.11.0.0"
+        kafka1.vm.provision "shell", inline: "ln -sf /opt/kafka_2.11-0.11.0.0 /opt/kafka"
+        kafka1.vm.provision "shell", inline: "rm -f /opt/kafka/config/server.properties"
+        kafka1.vm.provision "shell", inline: "cp /home/vagrant/devops/kafka/server.properties /opt/kafka/config/server.properties"
+        kafka1.vm.provision "shell", inline: "cp /home/vagrant/devops/kafka/kafka-service.sh /etc/init.d/kafka"
+        kafka1.vm.provision "shell", inline: "chmod 755 /etc/init.d/kafka"
+        kafka1.vm.provision "shell", inline: "sudo update-rc.d kafka defaults"
+        kafka1.vm.provision "shell", inline: "sudo service kafka start"
+    end
+	
+	config.vm.define "sparkslave1" do |sparkslave1|
+        sparkslave1.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/spark/hosts.slave1 >> /etc/hosts"
+		sparkslave1.vm.provision "shell", inline: "sudo apt-get install openssh-client -y"
+        sparkslave1.vm.provision "shell", inline: "wget https://d3kbcqa49mib13.cloudfront.net/spark-1.6.0-bin-hadoop2.6.tgz"
+        sparkslave1.vm.provision "shell", inline: "tar -xvzf spark-1.6.0-bin-hadoop2.6.tgz"
+        sparkslave1.vm.provision "shell", inline: "cp -R /home/vagrant/spark-1.6.0-bin-hadoop2.6 /opt"
+		sparkslave1.vm.provision "shell", inline: "sudo chmod -R 777 /opt/spark-1.6.0-bin-hadoop2.6"
+        sparkslave1.vm.provision "shell", inline: "ln -sf /opt/spark-1.6.0-bin-hadoop2.6 /opt/spark"
+        sparkslave1.vm.provision "shell", inline: "[ -f /opt/spark/conf/slaves ] && rm -f /opt/spark/conf/slaves"
+        sparkslave1.vm.provision "shell", inline: "cp /home/vagrant/devops/spark/slaves /opt/spark/conf/slaves"
+		sparkslave1.vm.provision "shell", inline: "sudo apt-get install openssh-server -y"
+		sparkslave1.vm.provision "shell", inline: "[ -d /home/vagrant/.ssh ] || mkdir /home/vagrant/.ssh"
+		sparkslave1.vm.provision "shell", inline: "[ -f /home/vagrant/.ssh/authorized_keys ] || touch /home/vagrant/.ssh/authorized_keys"
+		sparkslave1.vm.provision "shell", inline: "chmod 777 /home/vagrant/.ssh"
+		sparkslave1.vm.provision "shell", inline: "chmod 777 /home/vagrant/.ssh/authorized_keys"
+    end
+	
+	config.vm.define "sparkslave2" do |sparkslave2|
+        sparkslave2.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/spark/hosts.slave2 >> /etc/hosts"
+		sparkslave2.vm.provision "shell", inline: "sudo apt-get install openssh-client -y"
+        sparkslave2.vm.provision "shell", inline: "wget https://d3kbcqa49mib13.cloudfront.net/spark-1.6.0-bin-hadoop2.6.tgz"
+        sparkslave2.vm.provision "shell", inline: "tar -xvzf spark-1.6.0-bin-hadoop2.6.tgz"
+        sparkslave2.vm.provision "shell", inline: "cp -R /home/vagrant/spark-1.6.0-bin-hadoop2.6 /opt"
+		sparkslave2.vm.provision "shell", inline: "sudo chmod -R 777 /opt/spark-1.6.0-bin-hadoop2.6"
+        sparkslave2.vm.provision "shell", inline: "ln -sf /opt/spark-1.6.0-bin-hadoop2.6 /opt/spark"
+        sparkslave2.vm.provision "shell", inline: "[ -f /opt/spark/conf/slaves ] && rm -f /opt/spark/conf/slaves"
+        sparkslave2.vm.provision "shell", inline: "cp /home/vagrant/devops/spark/slaves /opt/spark/conf/slaves"
+		sparkslave2.vm.provision "shell", inline: "sudo apt-get install openssh-server -y"
+		sparkslave2.vm.provision "shell", inline: "[ -d /home/vagrant/.ssh ] || mkdir /home/vagrant/.ssh"
+		sparkslave2.vm.provision "shell", inline: "[ -f /home/vagrant/.ssh/authorized_keys ] || touch /home/vagrant/.ssh/authorized_keys"
+		sparkslave2.vm.provision "shell", inline: "chmod 777 /home/vagrant/.ssh"
+		sparkslave2.vm.provision "shell", inline: "chmod 777 /home/vagrant/.ssh/authorized_keys"
+    end
+	
+	config.vm.define "sparkslave3" do |sparkslave3|
+        sparkslave3.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/spark/hosts.slave3 >> /etc/hosts"
+		sparkslave3.vm.provision "shell", inline: "sudo apt-get install openssh-client -y"
+        sparkslave3.vm.provision "shell", inline: "wget https://d3kbcqa49mib13.cloudfront.net/spark-1.6.0-bin-hadoop2.6.tgz"
+        sparkslave3.vm.provision "shell", inline: "tar -xvzf spark-1.6.0-bin-hadoop2.6.tgz"
+        sparkslave3.vm.provision "shell", inline: "cp -R /home/vagrant/spark-1.6.0-bin-hadoop2.6 /opt"
+		sparkslave3.vm.provision "shell", inline: "sudo chmod -R 777 /opt/spark-1.6.0-bin-hadoop2.6"
+        sparkslave3.vm.provision "shell", inline: "ln -sf /opt/spark-1.6.0-bin-hadoop2.6 /opt/spark"
+        sparkslave3.vm.provision "shell", inline: "[ -f /opt/spark/conf/slaves ] && rm -f /opt/spark/conf/slaves"
+        sparkslave3.vm.provision "shell", inline: "cp /home/vagrant/devops/spark/slaves /opt/spark/conf/slaves"
+		sparkslave3.vm.provision "shell", inline: "sudo apt-get install openssh-server -y"
+		sparkslave3.vm.provision "shell", inline: "[ -d /home/vagrant/.ssh ] || mkdir /home/vagrant/.ssh"
+		sparkslave3.vm.provision "shell", inline: "[ -f /home/vagrant/.ssh/authorized_keys ] || touch /home/vagrant/.ssh/authorized_keys"
+		sparkslave3.vm.provision "shell", inline: "chmod 777 /home/vagrant/.ssh"
+		sparkslave3.vm.provision "shell", inline: "chmod 777 /home/vagrant/.ssh/authorized_keys"
+    end
+	
+	config.vm.define "sparkmaster1" do |sparkmaster1|
+        sparkmaster1.vm.provision "shell", inline: "sudo cat /home/vagrant/devops/spark/hosts.master1 >> /etc/hosts"
+		sparkmaster1.vm.provision "shell", inline: "sudo apt-get install openssh-client -y"
+		sparkmaster1.vm.provision "shell", inline: "sudo apt-get install sshpass -y"
+		sparkmaster1.vm.provision "shell", inline: "[ -f /home/vagrant/.ssh/id_rsa ] && rm -f /home/vagrant/.ssh/id_rsa"
+		sparkmaster1.vm.provision "shell", inline: "ssh-keygen -t rsa -P '' -f /home/vagrant/.ssh/id_rsa"
+		sparkmaster1.vm.provision "shell", inline: "sshpass -f /home/vagrant/devops/ssh/password.txt ssh-copy-id /home/vagrant/.ssh/id_rsa.pub vagrant@sparkslave1"
+		sparkmaster1.vm.provision "shell", inline: "sshpass -f /home/vagrant/devops/ssh/password.txt ssh-copy-id /home/vagrant/.ssh/id_rsa.pub vagrant@sparkslave2"
+		sparkmaster1.vm.provision "shell", inline: "sshpass -f /home/vagrant/devops/ssh/password.txt ssh-copy-id /home/vagrant/.ssh/id_rsa.pub vagrant@sparkslave3"
+        sparkmaster1.vm.provision "shell", inline: "wget https://d3kbcqa49mib13.cloudfront.net/spark-1.6.0-bin-hadoop2.6.tgz"
+        sparkmaster1.vm.provision "shell", inline: "tar -xvzf spark-1.6.0-bin-hadoop2.6.tgz"
+        sparkmaster1.vm.provision "shell", inline: "cp -R /home/vagrant/spark-1.6.0-bin-hadoop2.6 /opt"
+		sparkmaster1.vm.provision "shell", inline: "sudo chmod -R 777 /opt/spark-1.6.0-bin-hadoop2.6"
+        sparkmaster1.vm.provision "shell", inline: "ln -sf /opt/spark-1.6.0-bin-hadoop2.6 /opt/spark"
+        sparkmaster1.vm.provision "shell", inline: "[ -f /opt/spark/conf/slaves ] && rm -f /opt/spark/conf/slaves"
+        sparkmaster1.vm.provision "shell", inline: "cp /home/vagrant/devops/spark/slaves /opt/spark/conf/slaves"
+        sparkmaster1.vm.provision "shell", inline: "cp /home/vagrant/devops/spark/init.d /etc/init.d/spark"
+        sparkmaster1.vm.provision "shell", inline: "chmod 755 /etc/init.d/spark"
+        sparkmaster1.vm.provision "shell", inline: "sudo update-rc.d spark defaults"
+        sparkmaster1.vm.provision "shell", inline: "sudo service spark start"
+    end
+
+
+
+
+end
