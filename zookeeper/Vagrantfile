@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
         zoo3.vm.hostname = "zoo3"
     end
 
-    config.vm.synced_folder "src/", "/home/vagrant/src", owner:"vagrant", group: "vagrant"
+    # config.vm.synced_folder "src/", "/home/vagrant/src", owner:"vagrant", group: "vagrant"
     config.vm.synced_folder "devops/", "/home/vagrant/devops", owner:"vagrant", group: "vagrant"
 
     # VirtualBox specific settings
