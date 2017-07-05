@@ -123,7 +123,7 @@ the url http://192.168.10.17:8080 to your browser on the host computer. This wil
 ### Spark Cluster (with Zookeeper + Kafka)
 
 cd to the directory "spark" under the root directory and run "vagrant up". This will start a multi-machine vagrant setup in which a 
-storm cluster will be auto-started. The following VMs will be setup to run:
+spark cluster will be auto-started. The following VMs will be setup to run:
 
 * a zookeeper cluster at the following hostname:ips:
 
@@ -135,26 +135,21 @@ storm cluster will be auto-started. The following VMs will be setup to run:
 
     * kafka1:192.168.10.15
     
-* a storm cluster at the following hostname:ips (which uses the zookeeper cluster above):
+* a spark cluster at the following hostname:ips (which uses the zookeeper cluster above):
 
     * sparkmaster:192.168.10.21
     * sparkslave1:192.168.10.22
     * sparkslave2:192.168.10.23
     * sparkslave3:192.168.10.24
     
-For each of the spark VMs, the spark is installed at /opt/spark, and the configuration is at /opt/storm/conf/storm.yaml. 
+For each of the spark VMs, the spark is installed at /opt/spark, and the configuration is at /opt/spark/conf/slaves. 
 
-Within stormnimbus1 VM, the storm nimbus and storm ui is auto started when the VM is up or resumed
+Within sparkmaster1 VM, the spark cluster is auto started when the VM is up or resumed
 
-Within the stormnimbus1 VM, you can issue command such as as "service storm-nimbus start/stop/restart/status" 
-and "service storm-ui start/stop/restart/status"
-
-Within stormslave[x] VM, the storm supervisor is auto started when the VM is up.
-
-Within the stormslave[x] VMs, you can issue command such as "service storm-supervisor start/stop/restart/status"
+Within the sparkmaster1 VM, you can issue command such as as "service spark start/stop/restart/status" 
 
 Once the vagrant VMs are up and running, you can go to your host computer and enter 
-the url http://192.168.10.17:8080 to your browser on the host computer. This will show the storm UI.
+the url http://192.168.10.21:4040 to your browser on the host computer. This will show the spark UI.
 
 
 
