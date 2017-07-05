@@ -11,7 +11,7 @@ git clone this project to your local computer and cd to one of the directory, th
 ### Zookeeper Cluster
 
 cd to the directory "zookeeper" under the root directory and run "vagrant up". This will start a multi-machine vagrant 
-setup in which three ubuntu VMs runs a zookeeper cluster. The three ubuntu VMs have the following ip address 
+setup in which a zookeeper cluster will be auto-started on 3 VMs. The three ubuntu VMs have the following ip address 
 by default (hostname:ip-address):
 
 * zoo1: 192.168.10.12
@@ -33,10 +33,12 @@ The zoo.cfg for configuration is located in the VMs at "/etc/zookeeper/conf/zoo.
 
 Run "vagrant suspend" or "vagrant resume" to stop or restart the zookeeper cluster.
 
+For the zookeeper VMs, the zookeeper is auto started when the VM is up or resumed.
+
 ### Zookeeper+Kafka Cluster
 
 cd to the directory "zookeeper+kafka" under the root directory and run "vagrant up". This will start a multi-machine vagrant 
-setup in which three ubuntu VMs runs a zookeeper cluster. The three ubuntu VMs have the following ip address 
+setup in which a zookeeper cluster and a kafka server will be auto-started in 4 VMs. The 4 ubuntu VMs have the following ip address 
 by default (hostname:ip-address):
 
 * zoo1: 192.168.10.12
@@ -49,6 +51,10 @@ To login to one of the VMs, say kafka1, run "vagrant ssh kafka1".
 For the zookeeper configuration, refers to the earlier section.
 
 For the kafka1, the installation directory is in /opt/kafka,the configuration server.properties can be found in /opt/kafka/config/
+
+For the kafka1, the kafka is auto started when the VM is up or resumed.
+
+Within the VM, the kafka service can be managed by issuing command such as "service kafka start/stop/restart/status"
 
 To check if kafka is running, run the following command in kafka1:
 
@@ -71,7 +77,7 @@ To test the kafka consumer, run the following command:
 ### Storm Cluster
 
 cd to the directory "storm" under the root directory and run "vagrant up". This will start a multi-machine vagrant setup in which a 
-storm cluster will be spinned. The following VMs will be setup to run:
+storm cluster will be auto-started. The following VMs will be setup to run:
 
 * a zookeeper cluster at the following hostname:ips:
 
@@ -85,11 +91,22 @@ storm cluster will be spinned. The following VMs will be setup to run:
     
 * a storm cluster at the following hostname:ips (which uses the zookeeper cluster above):
 
-    * stormnumbus1:192.168.10.17
+    * stormnimbus1:192.168.10.17
     * stormslave1:192.168.10.18
     * stormslave2:192.168.10.19
     * stormslave3:192.168.10.20
     
+For each of the storm VMs, the storm is installed at /opt/storm, and the configuration is at /opt/storm/conf/storm.yaml. 
+
+Within stormnimbus1 VM, the storm nimbus and storm ui is auto started when the VM is up or resumed
+
+Within the stormnimbus1 VM, you can issue command such as as "service storm-nimbus start/stop/restart/status" 
+and "service storm-ui start/stop/restart/status"
+
+Within stormslave[x] VM, the storm supervisor is auto started when the VM is up.
+
+Within the stormslave[x] VMs, you can issue command such as "service storm-supervisor start/stop/restart/status"
+
 Once the vagrant VMs are up and running, you can go to your host computer and enter 
 the url http://192.168.10.17:8080 to your browser on the host computer. This will show the storm UI.
 
