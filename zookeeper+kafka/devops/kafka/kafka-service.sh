@@ -1,3 +1,5 @@
+#!/bin/bash
+
 DAEMON_PATH=/opt/kafka/bin
 DAEMON_NAME=kafka
 # Check that networking is up.
