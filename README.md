@@ -10,7 +10,7 @@ git clone this project to your local computer and cd to one of the directory, th
 
 ### Zookeeper Cluster
 
-cd to the directory "zookeeper" under the root directory and run "vagrant up". This will study a multi-machine vagrant 
+cd to the directory "zookeeper" under the root directory and run "vagrant up". This will start a multi-machine vagrant 
 setup in which three ubuntu VMs runs a zookeeper cluster. The three ubuntu VMs have the following ip address 
 by default (hostname:ip-address):
 
@@ -35,7 +35,7 @@ Run "vagrant suspend" or "vagrant resume" to stop or restart the zookeeper clust
 
 ### Zookeeper+Kafka Cluster
 
-cd to the directory "zookeeper+kafka" under the root directory and run "vagrant up". This will study a multi-machine vagrant 
+cd to the directory "zookeeper+kafka" under the root directory and run "vagrant up". This will start a multi-machine vagrant 
 setup in which three ubuntu VMs runs a zookeeper cluster. The three ubuntu VMs have the following ip address 
 by default (hostname:ip-address):
 
@@ -50,6 +50,12 @@ For the zookeeper configuration, refers to the earlier section.
 
 For the kafka1, the installation directory is in /opt/kafka,the configuration server.properties can be found in /opt/kafka/config/
 
+To check if kafka is running, run the following command in kafka1:
+
+```bash
+service kafka status
+```
+
 To test the kafka producer, create a topic and send a message to the topic using the following command in kafka1:
 
 ```bash
@@ -61,4 +67,31 @@ To test the kafka consumer, run the following command:
 ```bash 
 /opt/kafka/bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic TutorialTopic --from-beginning
 ```
+
+### Storm Cluster
+
+cd to the directory "storm" under the root directory and run "vagrant up". This will start a multi-machine vagrant setup in which a 
+storm cluster will be spinned. The following VMs will be setup to run:
+
+* a zookeeper cluster at the following hostname:ips:
+
+    * zoo1:192.168.10.12
+    * zoo2:192.168.10.13
+    * zoo3:192.168.10.14
+
+* a kafka server at the following hostname:ip (which use the zookeeper cluster above):
+
+    * kafka1:192.168.10.15
+    
+* a storm cluster at the following hostname:ips (which uses the zookeeper cluster above):
+
+    * stormnumbus1:192.168.10.17
+    * stormslave1:192.168.10.18
+    * stormslave2:192.168.10.19
+    * stormslave3:192.168.10.20
+    
+Once the vagrant VMs are up and running, you can go to your host computer and enter 
+the url http://192.168.10.17:8080 to your browser on the host computer. This will show the storm UI.
+
+
 
