@@ -48,7 +48,7 @@ To login to one of the VMs, say kafka1, run "vagrant ssh kafka1".
 
 For the zookeeper configuration, refers to the earlier section.
 
-For the kafka1, the installation directory is in /opt/kafka,the configuration server.properties can be found in /opt/kafka
+For the kafka1, the installation directory is in /opt/kafka,the configuration server.properties can be found in /opt/kafka/config/
 
 To test the kafka producer, create a topic and send a message to the topic using the following command in kafka1:
 
