@@ -120,9 +120,37 @@ Within the stormslave[x] VMs, you can issue command such as "service storm-super
 Once the vagrant VMs are up and running, you can go to your host computer and enter 
 the url http://192.168.10.17:8080 to your browser on the host computer. This will show the storm UI.
 
-### Spark Cluster (with Zookeeper + Kafka)
+### Hadoop Cluster
+
+cd to the directory "hadoop" under the root directory and run "vagrant up". This will start a multi-machine vagrant setup in which a 
+hdfs cluster will be auto-started. The following VMs will be setup to run:
+
+
+
+### Spark Cluster
 
 cd to the directory "spark" under the root directory and run "vagrant up". This will start a multi-machine vagrant setup in which a 
+spark cluster will be auto-started. The following VMs will be setup to run:
+    
+* a spark cluster at the following hostname:ips (which uses the zookeeper cluster above):
+
+    * sparkmaster:192.168.10.21
+    * sparkslave1:192.168.10.22
+    * sparkslave2:192.168.10.23
+    * sparkslave3:192.168.10.24
+    
+For each of the spark VMs, the spark is installed at /opt/spark, and the configuration is at /opt/spark/conf/slaves. 
+
+Within sparkmaster1 VM, the spark cluster is auto started when the VM is up or resumed
+
+Within the sparkmaster1 VM, you can issue command such as as "service spark start/stop/restart/status" 
+
+Once the vagrant VMs are up and running, you can go to your host computer and enter 
+the url http://192.168.10.21:4040 to your browser on the host computer. This will show the spark UI.
+
+### Spark Cluster (with Zookeeper + Kafka)
+
+cd to the directory "spark+zookeeper+kafka" under the root directory and run "vagrant up". This will start a multi-machine vagrant setup in which a 
 spark cluster will be auto-started. The following VMs will be setup to run:
 
 * a zookeeper cluster at the following hostname:ips:
